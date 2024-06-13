@@ -1,0 +1,19 @@
+{
+  "name": "btc-wallet-tracker",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "@mempool/mempool.js": "^2.3.0",
+    "axios": "^1.7.2",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "dotenv": "^16.4.5",
+    "morgan": "~1.9.1",
+    "node-telegram-bot-api": "^0.66.0",
+    "sleep-promise": "^9.1.0"
+  }
+}
