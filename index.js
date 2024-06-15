@@ -6,7 +6,7 @@ import TelegramBot from 'node-telegram-bot-api';
 const token = process.env.TELEGRAM_BOT_KEY;
 
 const init = async () => {
-  const bot = new TelegramBot(token, {polling: true});
+  const bot = new TelegramBot(token)//, {polling: true});
   bot.sendMessage('6841505420' ,
     `Workin`,
     { parse_mode: "HTML" }
@@ -42,6 +42,10 @@ const init = async () => {
             { parse_mode: "HTML" }
             );
           bot.sendMessage('6500521034' ,
+            `<b><u>MOVEMENT ALERT - ${ wallet.name }</u></b> \n\nWallet Address:\n https://magiceden.io/runes/portfolio/${ wallet.address }`,
+            { parse_mode: "HTML" }
+            );
+          bot.sendMessage('6965044835' ,
             `<b><u>MOVEMENT ALERT - ${ wallet.name }</u></b> \n\nWallet Address:\n https://magiceden.io/runes/portfolio/${ wallet.address }`,
             { parse_mode: "HTML" }
             );
