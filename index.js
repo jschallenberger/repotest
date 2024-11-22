@@ -19,7 +19,7 @@ const init = async () => {
 //    {address:'bc1pru42pw6d8u0k09q9efktept0cymvhygjvrdlw39h83gflpzjct2qc6z9q8', name:'Bweys', pastCount: 0},
 //    {address:'bc1pn793eu2vn9agqlfvz5ym88lk7huatvjvl4ku5ka6zyawn9wggzssv5n2ky', name:'OG General', pastCount: 0},
 //    {address:'bc1pq596l0778dnx8hsm6caehrey4f6jgw0f4sklg8m6dmcxvx4p2qvqvxnmky', name:'Augosto Bagos', pastCount: 0},
-    {address:'bc1prxkfmpxq23vkfglu6wn9a4k6zwdw5jjew8v7qqgjxut35zacyqpsvkrmrr', name:'Shin ALTERNATIVE', pastCount: 0},
+    {address:'bc1p2zgtpurrn70s77zrxsrc37cf2kd78was053swgw3wruy77wpm75qvxstql', name:'Shin ALTERNATIVE', pastCount: 0},
   ];
 
   while(x != 10){
