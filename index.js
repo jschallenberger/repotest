@@ -2,42 +2,57 @@ import mempoolJS from "@mempool/mempool.js";
 import sleep from "sleep-promise";
 import 'dotenv/config'
 import TelegramBot from 'node-telegram-bot-api';
+import fs from 'fs';
 
 const token = process.env.TELEGRAM_BOT_KEY;
+const WALLET_DATA_FILE = 'walletData.json';
+
+// Function to read wallet data from file
+const readWalletData = () => {
+  try {
+    const data = fs.readFileSync(WALLET_DATA_FILE, 'utf8');
+    return JSON.parse(data).wallets;
+  } catch (error) {
+    console.error('Error reading wallet data:', error);
+    return [];
+  }
+};
+
+// Function to save wallet data to file
+const saveWalletData = (wallets) => {
+  try {
+    fs.writeFileSync(WALLET_DATA_FILE, JSON.stringify({ wallets }, null, 2));
+  } catch (error) {
+    console.error('Error saving wallet data:', error);
+  }
+};
 
 const init = async () => {
   const bot = new TelegramBot(token)//, {polling: true});
-  bot.sendMessage('-4285238134' ,
-    `Workin`,
+  bot.sendMessage('-4285238134',
+    `Working`,
     { parse_mode: "HTML" }
-    );
+  );
   var x = 1;
-  var walletList = [
-    {address:'bc1prxkfmpxq23vkfglu6wn9a4k6zwdw5jjew8v7qqgjxut35zacyqpsvkrmrr', name:'Shin', pastCount: 0},
-//    {address:'bc1pansakzmn6x0j54u4dw4ctak626zj4a67lsh8pcmyhujdercwzqusa74s4v', name:'Chartfu', pastCount: 0},
-//    {address:'bc1prlukv7lkaedmg7a0hdmfce30tr7vu78k2dycggdevqr8szz0hzdswlm49q', name:'Kook', pastCount: 0},
-//    {address:'bc1pru42pw6d8u0k09q9efktept0cymvhygjvrdlw39h83gflpzjct2qc6z9q8', name:'Bweys', pastCount: 0},
-//    {address:'bc1pn793eu2vn9agqlfvz5ym88lk7huatvjvl4ku5ka6zyawn9wggzssv5n2ky', name:'OG General', pastCount: 0},
-//    {address:'bc1pq596l0778dnx8hsm6caehrey4f6jgw0f4sklg8m6dmcxvx4p2qvqvxnmky', name:'Augosto Bagos', pastCount: 0},
-    {address:'bc1p2zgtpurrn70s77zrxsrc37cf2kd78was053swgw3wruy77wpm75qvxstql', name:'Shin ALTERNATIVE', pastCount: 0},
-  ];
+  var walletList = readWalletData();
 
   while(x != 10){
     const { bitcoin: { addresses } } = mempoolJS({
         hostname: 'mempool.space'
     });
 
-    walletList.forEach(async function (wallet){
-      const address = wallet.address
-      const pastCount = wallet.pastCount
-      const myAddress = await addresses.getAddress({ address });
-      const txCount = myAddress.chain_stats.tx_count
+    // Process wallets sequentially to ensure proper async handling
+    for (const wallet of walletList) {
+      try {
+        const address = wallet.address;
+        const pastCount = wallet.pastCount;
+        const myAddress = await addresses.getAddress({ address });
+        const txCount = myAddress.chain_stats.tx_count;
 
-      console.log(wallet.name, wallet.pastCount, myAddress.chain_stats.tx_count)
-
+        console.log(wallet.name, wallet.pastCount, myAddress.chain_stats.tx_count);
     
-      if (txCount !== pastCount){
-        if (pastCount != 0) {
+        if (txCount !== pastCount){
+          if (pastCount != 0) {
 //          bot.sendMessage('6841505420' ,
 //            `<b><u>MOVEMENT ALERT - ${ wallet.name }</u></b> \n\nWallet Address:\n https://magiceden.io/runes/portfolio/${ wallet.address }\n\n ${txCount}`,
 //           { parse_mode: "HTML" }
@@ -51,16 +66,21 @@ const init = async () => {
 //            { parse_mode: "HTML" }
 //            );
             // bot.sendMessage('6500521034', `MOVEMENT ALERT ${ wallet.name } \n\n\nWallet Address: \n https://magiceden.io/runes/portfolio/${ wallet.address }`); //schallen
-          bot.sendMessage('-4285238134' ,
-            `<b><u>MOVEMENT ALERT - ${ wallet.name }</u></b> \n\nWallet Address:\n https://magiceden.io/runes/portfolio/${ wallet.address }`,
-            { parse_mode: "HTML" }
+            bot.sendMessage('-4285238134',
+              `<b><u>MOVEMENT ALERT - ${ wallet.name }</u></b> \n\nWallet Address:\n https://magiceden.io/runes/portfolio/${ wallet.address }`,
+              { parse_mode: "HTML" }
             );
+          }
         }
+        wallet.pastCount = txCount;
+      } catch (error) {
+        console.error(`Error processing wallet ${wallet.name}:`, error);
       }
-      wallet.pastCount = txCount;
-    })
-    console.log(new Date().getTime())
-    await sleep(300000);   
+    }
+    
+    console.log(new Date().getTime());
+    saveWalletData(walletList);
+    await sleep(300000); // 5 minutes  
   }
 };
 
