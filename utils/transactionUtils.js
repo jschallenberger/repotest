@@ -39,41 +39,30 @@ const processTransactions = async (bot, wallet, recentTxs, { isRuneTransaction, 
     }
 
     console.log(`\nProcessing ${recentTxs.length} transactions for wallet ${wallet.name}`);
-    
+
     for (const tx of recentTxs) {
         try {
             console.log(`\nAnalyzing transaction ${tx.txid}`);
-            console.log('Transaction outputs:');
-            console.log(JSON.stringify(tx.vout, null, 2));
-            
             const isRune = isRuneTransaction(tx);
             console.log(`Is Rune transaction: ${isRune}`);
 
             if (isRune) {
+                console.log(`Fetching Rune details for transaction ${tx.txid}...`);
                 const runeName = await getRuneDetails(tx.txid);
-                console.log(`Rune name: ${runeName}`);
                 if (runeName) {
+                    console.log(`Found Rune: ${runeName}`);
                     console.log(`Sending Rune movement alert for ${runeName}`);
-                    await sendTelegramAlert(
-                        bot, 
-                        messageTemplates.runeMovement(wallet.name, wallet.address, runeName)
-                    );
+                    await sendTelegramAlert(bot, messageTemplates.runeMovement(wallet.name, wallet.address, runeName));
                 } else {
                     console.log('Sending regular movement alert (Rune not found)');
-                    await sendTelegramAlert(
-                        bot, 
-                        messageTemplates.regularMovement(wallet.name, wallet.address)
-                    );
+                    await sendTelegramAlert(bot, messageTemplates.regularMovement(wallet.name, wallet.address));
                 }
             } else {
                 console.log('Sending regular movement alert');
-                await sendTelegramAlert(
-                    bot, 
-                    messageTemplates.regularMovement(wallet.name, wallet.address)
-                );
+                await sendTelegramAlert(bot, messageTemplates.regularMovement(wallet.name, wallet.address));
             }
         } catch (error) {
-            console.error(`Error processing transaction ${tx.txid} for wallet ${wallet.name}:`, error);
+            console.error(`Error processing transaction ${tx.txid}:`, error);
         }
     }
 };

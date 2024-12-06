@@ -17,7 +17,7 @@ async function runMonitoring(bot, addresses, utils) {
             return;
         }
         console.log(`\nMonitoring ${wallets.length} wallets...`);
-        await startMonitoring(addresses, bot, wallets, utils);
+        await startMonitoring(addresses, bot, wallets, utils, TIME_WINDOW_MINUTES);
     } catch (error) {
         console.error('Error in monitoring loop:', error);
     }

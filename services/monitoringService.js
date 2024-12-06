@@ -1,7 +1,7 @@
 import { getRecentTransactions, processTransactions } from '../utils/transactionUtils.js';
 import { updateWalletCount } from '../utils/walletUtils.js';
 
-const monitorWallet = async (addresses, bot, wallet, utils) => {
+const monitorWallet = async (addresses, bot, wallet, utils, timeWindowMinutes) => {
     try {
         const addressData = await addresses.getAddress({ address: wallet.address });
         
@@ -18,7 +18,7 @@ const monitorWallet = async (addresses, bot, wallet, utils) => {
             return false;
         }
         console.log(`Checking recent transactions for ${wallet.name}...`);
-        const recentTxs = await getRecentTransactions(addresses, wallet.address);
+        const recentTxs = await getRecentTransactions(addresses, wallet.address, timeWindowMinutes);
         if (recentTxs.length > 0) {
             await processTransactions(bot, wallet, recentTxs, utils);
         }
@@ -31,12 +31,11 @@ const monitorWallet = async (addresses, bot, wallet, utils) => {
     }
 };
 
-const startMonitoring = async (addresses, bot, wallets, utils) => {
-    const monitoringPromises = wallets.map(wallet => 
-        monitorWallet(addresses, bot, wallet, utils)
-    );
-    
-    await Promise.all(monitoringPromises);
+const startMonitoring = async (addresses, bot, wallets, utils, timeWindowMinutes) => {
+    console.log(`Starting monitoring for ${wallets.length} wallets...`);
+    for (const wallet of wallets) {
+        await monitorWallet(addresses, bot, wallet, utils, timeWindowMinutes);
+    }
 };
 
 export {
